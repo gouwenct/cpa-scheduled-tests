@@ -1,5 +1,13 @@
 # CPA Scheduled Tests
 
+上级索引：[README.md](README.md)。
+
+## 界面截图
+
+![Scheduled Tests 插件界面](assets/scheduled-tests.png)
+
+截图来自早期界面；当前版本另有“一键添加全部账号”和 GitHub / Star 入口。
+
 一个原生 CLIProxyAPI（CPA）插件，按 Sub2API Scheduled Tests 的思路提供：
 
 - **账号 + Model + Cron** 的定时测试计划；
@@ -14,7 +22,7 @@
 
 “全部账号立即发送”是**强制真实请求**，不会判断该账号的 5 小时窗口是否已经开启，因此会产生极小的真实模型请求消耗。对于 `disabled` / `unavailable` 的 auth 文件，插件仍会尝试读取凭据并请求；若 token 已失效，会记录 `auth_error`，不会偷偷修改 CPA 账号状态。
 
-当前 v0.1.2 专门面向 **Codex / ChatGPT OAuth auth**。Model 字段为自由文本；UI 也会通过 CPA 的 `model-definitions/codex` 自动同步当前模型列表作为下拉建议。
+当前 v0.1.3 专门面向 **Codex / ChatGPT OAuth auth**。Model 字段为自由文本；UI 也会通过 CPA 的 `model-definitions/codex` 自动同步当前模型列表作为下拉建议。
 
 ## UI
 
@@ -160,7 +168,7 @@ POST /plugins/cpa-scheduled-tests/logs/clear
 
 ```text
 dist\cpa-scheduled-tests.dll
-dist\cpa-scheduled-tests_0.1.2_windows_amd64.zip
+dist\cpa-scheduled-tests_0.1.3_windows_amd64.zip
 ```
 
 ## 安全设计

@@ -4,6 +4,12 @@ Native CLIProxyAPI (CPA) plugin for Sub2API-style scheduled Codex tests.
 
 > 中文说明：[README_CN.md](README_CN.md)
 
+## Screenshot
+
+![Scheduled Tests panel](assets/scheduled-tests.png)
+
+The screenshot shows an earlier UI; current releases also include bulk plan creation and a GitHub / Star link.
+
 ## Features
 
 - Per-account scheduled tests: **Account + Model + Cron + Timezone + Prompt**

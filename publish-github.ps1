@@ -75,7 +75,7 @@ try {
     & git diff --cached --quiet
     $hasChanges = ($LASTEXITCODE -ne 0)
     if ($hasChanges -or -not $hasHead) {
-        & git commit -m "Initial release: CPA Scheduled Tests v0.1.2"
+        & git commit -m "Initial release: CPA Scheduled Tests v0.1.3"
     }
 
     & gh repo view $repoSlug *> $null
@@ -97,16 +97,22 @@ try {
     }
 
     if ($CreateRelease) {
-        $tag = "v0.1.2"
+        $tag = "v0.1.3"
         & gh release view $tag --repo $repoSlug *> $null
         if ($LASTEXITCODE -ne 0) {
             $assets = @()
-            $winZip = Join-Path $PSScriptRoot "dist\cpa-scheduled-tests_0.1.2_windows_amd64.zip"
-            $linuxZip = Join-Path $PSScriptRoot "dist\cpa-scheduled-tests_0.1.2_linux_amd64.zip"
+            $winZip = Join-Path $PSScriptRoot "dist\cpa-scheduled-tests_0.1.3_windows_amd64.zip"
+            $linuxZip = Join-Path $PSScriptRoot "dist\cpa-scheduled-tests_0.1.3_linux_amd64.zip"
             if (Test-Path $winZip) { $assets += $winZip }
             if (Test-Path $linuxZip) { $assets += $linuxZip }
+            $checksumPath = Join-Path $PSScriptRoot "dist\checksums.txt"
+            $checksumLines = @($assets | ForEach-Object { (Get-FileHash -LiteralPath $_ -Algorithm SHA256).Hash.ToLowerInvariant() + "  " + [IO.Path]::GetFileName($_) })
+            if ($checksumLines.Count -gt 0) {
+                [IO.File]::WriteAllText($checksumPath, ($checksumLines -join "`n") + "`n", [Text.UTF8Encoding]::new($false))
+                $assets += $checksumPath
+            }
 
-            $args = @("release", "create", $tag, "--repo", $repoSlug, "--title", "CPA Scheduled Tests v0.1.2", "--generate-notes")
+            $args = @("release", "create", $tag, "--repo", $repoSlug, "--title", "CPA Scheduled Tests v0.1.3", "--generate-notes")
             $args += $assets
             & gh @args
             if ($LASTEXITCODE -ne 0) { throw "GitHub Release creation failed." }

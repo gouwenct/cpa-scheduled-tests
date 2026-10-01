@@ -22,7 +22,7 @@ $ZigRoot = Join-Path $ToolDir "zig-x86_64-windows-$ZigVersion"
 $ZigExe = Join-Path $ZigRoot "zig.exe"
 $CCWrapper = Join-Path $ToolDir "zigcc.cmd"
 $Dll = Join-Path $DistDir "cpa-scheduled-tests.dll"
-$Package = Join-Path $DistDir "cpa-scheduled-tests_0.1.2_windows_amd64.zip"
+$Package = Join-Path $DistDir "cpa-scheduled-tests_0.1.3_windows_amd64.zip"
 
 function Download-IfMissing {
     param([string]$Url, [string]$Path)
@@ -87,6 +87,8 @@ $Header = [System.IO.Path]::ChangeExtension($Dll, ".h")
 if (Test-Path $Header) { Remove-Item -Force $Header }
 if (Test-Path $Package) { Remove-Item -Force $Package }
 Compress-Archive -Path $Dll -DestinationPath $Package -Force
+$checksum = (Get-FileHash -LiteralPath $Package -Algorithm SHA256).Hash.ToLowerInvariant()
+[IO.File]::WriteAllText((Join-Path $DistDir 'checksums.txt'), "$checksum  $([IO.Path]::GetFileName($Package))`n", [Text.UTF8Encoding]::new($false))
 
 $PluginDir = Join-Path $CpaDir "plugins\windows\amd64"
 New-Item -ItemType Directory -Force -Path $PluginDir | Out-Null

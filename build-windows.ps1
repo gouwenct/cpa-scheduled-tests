@@ -19,8 +19,10 @@ $dll = Join-Path $PSScriptRoot 'dist\cpa-scheduled-tests.dll'
 if ($LASTEXITCODE -ne 0) { throw 'go build failed' }
 Remove-Item 'dist\cpa-scheduled-tests.h' -ErrorAction SilentlyContinue
 
-$zip = Join-Path $PSScriptRoot 'dist\cpa-scheduled-tests_0.1.2_windows_amd64.zip'
+$zip = Join-Path $PSScriptRoot 'dist\cpa-scheduled-tests_0.1.3_windows_amd64.zip'
 Remove-Item $zip -ErrorAction SilentlyContinue
 Compress-Archive -Path $dll -DestinationPath $zip
+$checksum = (Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash.ToLowerInvariant()
+[IO.File]::WriteAllText((Join-Path $PSScriptRoot 'dist\checksums.txt'), "$checksum  $([IO.Path]::GetFileName($zip))`n", [Text.UTF8Encoding]::new($false))
 Write-Host "Built DLL: $dll"
 Write-Host "Built ZIP: $zip"

@@ -1,4 +1,4 @@
-CPA Scheduled Tests v0.1.2 - Windows
+CPA Scheduled Tests v0.1.3 - Windows
 
 用途：
 - 账号 + Model + Cron 定时计划

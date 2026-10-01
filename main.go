@@ -76,7 +76,7 @@ import (
 
 const (
 	pluginID                      = "cpa-scheduled-tests"
-	pluginVersion                 = "0.1.2"
+	pluginVersion                 = "0.1.3"
 	supportedSchemaVersion uint32 = 6
 )
 
@@ -223,7 +223,7 @@ func registration(hostSchemaVersion uint32) registrationResult {
 		Metadata: registrationMetadata{
 			Name:             "CPA Scheduled Tests",
 			Version:          pluginVersion,
-			Author:           "Local Custom Plugin",
+			Author:           "gouwenct",
 			GitHubRepository: "https://github.com/gouwenct/cpa-scheduled-tests",
 			Description:      "Sub2API-style scheduled per-account Codex test plans with model selection, persistent logs, quick send, and send-all-now.",
 			ConfigFields:     []configField{},
