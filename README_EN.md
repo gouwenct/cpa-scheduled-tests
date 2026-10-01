@@ -2,7 +2,7 @@
 
 Native CLIProxyAPI (CPA) plugin for Sub2API-style scheduled Codex tests.
 
-> 中文说明：[README_CN.md](README_CN.md)
+> 中文说明：[README.md](README.md)
 
 ## Screenshot
 
@@ -43,7 +43,11 @@ plugins/windows/amd64/cpa-scheduled-tests.dll
 
 Then fully restart CPA and open **Scheduled Tests** in the Management Center.
 
-For Windows source builds and one-click local installation, see [README_CN.md](README_CN.md).
+## Agent-assisted installation
+
+For a Chinese-first installation or update, copy the prompt in [README.md](README.md#让-agent-安装或更新) to your Agent. It checks the latest release, verifies the SHA-256 checksum, backs up the old DLL, replaces it only after CPA Core is stopped, and verifies plugin registration after restart. It must not expose management keys or OAuth tokens.
+
+For Windows source builds and one-click local installation, see [README.md](README.md).
 
 ## Example cron
 

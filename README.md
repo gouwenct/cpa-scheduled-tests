@@ -1,6 +1,6 @@
 # CPA Scheduled Tests
 
-上级索引：[README.md](README.md)。
+English version: [README_EN.md](README_EN.md)
 
 ## 界面截图
 
@@ -91,6 +91,30 @@ plugins/cpa-scheduled-tests.dll
 ```
 
 然后完整重启 CPA。
+
+## 让 Agent 安装或更新
+
+把下面的提示词直接发给你的 Agent。它会优先使用中文，并在替换 DLL 前检查版本、备份旧文件和校验下载包：
+
+```text
+请使用中文帮助我安装或更新 CPA Scheduled Tests 插件到最新版本。
+
+目标：
+- 仓库：https://github.com/gouwenct/cpa-scheduled-tests
+- 先读取 GitHub 最新 Release 和 checksums.txt，不要猜版本号。
+- 先检查本机 EasyCLIProxyAPI/CPA Core 是否运行、插件目录、当前 DLL 版本和文件哈希。
+- 如果 CPA Core 正在运行，请先提示我在 EasyCLIProxyAPI 中停止 CPA Core；不要强制结束进程。
+- 停止后，把旧的 cpa-scheduled-tests.dll 备份到同目录的 OLD 文件夹，再复制新 DLL。
+- 校验下载包中的 SHA-256；校验失败就停止，不要覆盖旧文件。
+- 保持文件名为 cpa-scheduled-tests.dll，不要修改现有计划、日志或 config.yaml 中无关的配置。
+- 启动 CPA Core 后验证插件的 registered=true、effective_enabled=true，并报告安装路径、版本和哈希。
+- 不要输出、保存或传播 CPA Management Key、OAuth token 或账号凭据。
+- 没有权限时，明确告诉我需要以管理员身份执行的具体步骤。
+
+完成后请用中文报告：已执行操作、验证结果、注意事项、未执行操作。
+```
+
+当前 Windows x64 安装包：[v0.1.3 Release](https://github.com/gouwenct/cpa-scheduled-tests/releases/tag/v0.1.3)。
 
 
 ## Windows 一键构建并安装
