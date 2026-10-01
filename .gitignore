@@ -1,0 +1,27 @@
+# Build outputs
+dist/
+*.dll
+*.so
+*.dylib
+*.exe
+
+# Local toolchains / caches
+.tools/
+.cache/
+*.tmp
+*.log
+
+# Runtime state
+.data/
+state.json
+runs.jsonl
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# PowerShell backups
+*.bak
+*.backup*

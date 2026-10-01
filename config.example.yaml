@@ -1,0 +1,7 @@
+plugins:
+  enabled: true
+  dir: plugins
+  configs:
+    cpa-scheduled-tests:
+      enabled: true
+      priority: 1

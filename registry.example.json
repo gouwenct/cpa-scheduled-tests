@@ -1,0 +1,17 @@
+{
+  "plugins": [
+    {
+      "id": "cpa-scheduled-tests",
+      "name": "CPA Scheduled Tests",
+      "description": "Per-account/model cron tests, logs, quick send and send-all-now for Codex accounts.",
+      "author": "gouwenct",
+      "version": "0.1.2",
+      "release-tag": "v0.1.2",
+      "repository": "https://github.com/gouwenct/cpa-scheduled-tests",
+      "homepage": "https://github.com/gouwenct/cpa-scheduled-tests",
+      "license": "MIT",
+      "tags": ["Codex", "Scheduled Tests", "Accounts"],
+      "install": {"type": "github-release"}
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+CPA Scheduled Tests v0.1.2 升级说明
+=================================
+
+新增：
+- 定时测试计划区域增加“一键添加全部账号”。
+- 只需填写一次 Model、Cron、时区、Prompt，即可为当前全部 Codex auth 账号创建独立计划。
+- 包括 disabled / unavailable 账号。
+- 自动去重：若同一账号已经存在相同 Model + Cron + 时区 + Prompt 的计划，则跳过，不重复创建。
+- 创建后仍然保持“一账号一计划”，可分别编辑、停用、立即发送或删除。
+
+保留 v0.1.1 的修复：
+- 完整 Metadata.GitHubRepository，兼容 CPA 插件注册校验。
+- 根据宿主 schema_version 协商插件 RPC schema（最高 6）。
+
+升级：
+1. 完全退出/停止 CPA Core。
+2. 在本目录用管理员 PowerShell 运行：
+
+   .\install-windows.ps1 `
+     -CpaDir "D:\Program Files\EasyCLIProxyAPI-update-v0.2.7-Windows-amd64\cpa-core"
+
+3. 再启动 CPA Core。
+4. 打开 Scheduled Tests，定时测试计划右上角会出现“一键添加全部账号”。
+
+无需再次修改 config.yaml。

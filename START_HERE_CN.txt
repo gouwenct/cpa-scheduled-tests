@@ -1,0 +1,34 @@
+CPA Scheduled Tests v0.1.2 - Windows
+
+用途：
+- 账号 + Model + Cron 定时计划
+- 一键为全部 Codex 账号创建定时计划（统一 Model/Cron/时区/Prompt，自动去重）
+- 每条计划“立即发送”
+- 指定账号快速发送
+- 一键向所有 Codex 账号发送（包括 disabled/unavailable）
+- 持久化日志
+- CPA 原生插件，安装后不需要外部定时器
+
+推荐安装：
+1. 解压本包。
+2. PowerShell 7 进入本目录。
+3. 执行：
+   Set-ExecutionPolicy -Scope Process Bypass
+   .\install-windows.ps1 -CpaDir '你的CPA目录'
+
+如要自动写入 CPA 插件配置：
+   .\install-windows.ps1 `
+     -CpaDir '你的CPA目录' `
+     -BaseUrl 'http://127.0.0.1:8317' `
+     -ManagementKey '你的ManagementKey'
+
+4. 完整重启 CPA。
+5. 在 CPA 侧栏打开 Scheduled Tests。
+6. 页面首次打开输入 CPA Management Key，点击“保存本会话”。
+
+示例 Cron：
+0 6,11,16,21 * * *
+= 每天 06:00、11:00、16:00、21:00
+
+注意：
+“一键向全部账号发送”和“立即发送”都是真实模型请求，会产生少量真实额度消耗。
