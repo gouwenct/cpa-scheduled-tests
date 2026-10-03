@@ -12,17 +12,18 @@ English version: [README_EN.md](README_EN.md)
 
 - **账号 + Model + Cron** 的定时测试计划；
 - **一键为全部 Codex 账号创建定时计划**：统一指定 Model、Cron、时区和 Prompt，自动一账号一计划，并跳过完全重复计划；
-- 每个计划的 **立即发送**；
-- 独立的 **快速发送**（指定账号 + Model）；
+- 每个计划的 **立即发送、暂停/恢复**，计划表每页显示 10 条；
+- 计划按 **分组** 管理，编辑和新建计划提供账号、Model 的下拉选择及默认值，Cron 保留自由输入；
+- 时区支持常用建议和任意有效 IANA 时区输入；新建计划默认使用浏览器时区，编辑时保留计划已保存的时区；
 - **一键向全部 Codex 账号发送**，遍历 `host.auth.list` 中的所有 Codex auth 记录，不因 `disabled` / `unavailable` 字段而跳过；
-- JSONL 持久化日志：时间、触发方式、账号、Model、HTTP 状态、延迟、错误分类；
+- JSONL 持久化日志：时间、触发方式、账号、Model、HTTP 状态、延迟、错误分类；界面只显示最近两天；
 - 全部功能运行在 CPA 进程内，无需 Windows Task Scheduler、PowerShell 常驻或外部服务。
 
 ## 重要说明
 
 “全部账号立即发送”是**强制真实请求**，不会判断该账号的 5 小时窗口是否已经开启，因此会产生极小的真实模型请求消耗。对于 `disabled` / `unavailable` 的 auth 文件，插件仍会尝试读取凭据并请求；若 token 已失效，会记录 `auth_error`，不会偷偷修改 CPA 账号状态。
 
-当前 v0.1.3 专门面向 **Codex / ChatGPT OAuth auth**。Model 字段为自由文本；UI 也会通过 CPA 的 `model-definitions/codex` 自动同步当前模型列表作为下拉建议。
+当前 v0.1.3 专门面向 **Codex / ChatGPT OAuth auth**。UI 会通过 CPA 的 `model-definitions/codex` 自动同步当前模型列表作为下拉选项。
 
 ## UI
 

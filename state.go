@@ -27,6 +27,7 @@ type Settings struct {
 type Plan struct {
 	ID               string    `json:"id"`
 	Name             string    `json:"name"`
+	Group            string    `json:"group,omitempty"`
 	Enabled          bool      `json:"enabled"`
 	AuthIndex        string    `json:"auth_index"`
 	AccountName      string    `json:"account_name,omitempty"`
@@ -53,6 +54,7 @@ type PersistentState struct {
 
 type BulkPlanSpec struct {
 	NamePrefix string `json:"name_prefix"`
+	Group      string `json:"group,omitempty"`
 	Model      string `json:"model"`
 	Cron       string `json:"cron"`
 	Timezone   string `json:"timezone"`
@@ -130,6 +132,8 @@ type runtimeState struct {
 
 var rt runtimeState
 var logMu sync.Mutex
+
+const logRetentionWindow = 48 * time.Hour
 
 func defaultSettings() Settings {
 	return Settings{
@@ -247,6 +251,18 @@ func normalizeState(s *PersistentState) {
 	if s.Plans == nil {
 		s.Plans = []Plan{}
 	}
+	for i := range s.Plans {
+		if strings.TrimSpace(s.Plans[i].Group) == "" {
+			group := strings.TrimSpace(s.Plans[i].Name)
+			if before, _, ok := strings.Cut(group, " · "); ok {
+				group = before
+			}
+			if group == "" {
+				group = "默认"
+			}
+			s.Plans[i].Group = group
+		}
+	}
 }
 
 func snapshotPersistent() PersistentState {
@@ -301,14 +317,18 @@ func saveSettings(settings Settings) error {
 
 func validatePlan(p *Plan) error {
 	p.Name = strings.TrimSpace(p.Name)
+	p.Group = strings.TrimSpace(p.Group)
 	p.AuthIndex = strings.TrimSpace(p.AuthIndex)
 	p.Model = strings.TrimSpace(p.Model)
 	p.Cron = strings.TrimSpace(p.Cron)
 	p.Timezone = strings.TrimSpace(p.Timezone)
 	p.Prompt = strings.TrimSpace(p.Prompt)
 
+	if p.Group == "" {
+		p.Group = "默认"
+	}
 	if p.Name == "" {
-		return fmt.Errorf("plan name is required")
+		p.Name = p.Group
 	}
 	if p.AuthIndex == "" {
 		return fmt.Errorf("account is required")
@@ -387,13 +407,17 @@ func planDedupeKey(p Plan) string {
 }
 
 func bulkCreatePlans(accounts []AuthFile, spec BulkPlanSpec) (BulkPlanResult, error) {
+	spec.Group = strings.TrimSpace(spec.Group)
 	spec.NamePrefix = strings.TrimSpace(spec.NamePrefix)
+	if spec.Group == "" {
+		spec.Group = spec.NamePrefix
+	}
 	spec.Model = strings.TrimSpace(spec.Model)
 	spec.Cron = strings.TrimSpace(spec.Cron)
 	spec.Timezone = strings.TrimSpace(spec.Timezone)
 	spec.Prompt = strings.TrimSpace(spec.Prompt)
-	if spec.NamePrefix == "" {
-		spec.NamePrefix = "全账号定时"
+	if spec.Group == "" {
+		spec.Group = "全账号定时"
 	}
 	if spec.Timezone == "" {
 		spec.Timezone = defaultSettings().DefaultTimezone
@@ -404,7 +428,8 @@ func bulkCreatePlans(accounts []AuthFile, spec BulkPlanSpec) (BulkPlanResult, er
 
 	// Validate the shared schedule once before mutating persistent state.
 	template := Plan{
-		Name:      spec.NamePrefix,
+		Name:      spec.Group,
+		Group:     spec.Group,
 		AuthIndex: "validation-placeholder",
 		Model:     spec.Model,
 		Cron:      spec.Cron,
@@ -439,7 +464,8 @@ func bulkCreatePlans(accounts []AuthFile, spec BulkPlanSpec) (BulkPlanResult, er
 		}
 		p := Plan{
 			ID:           newID("plan"),
-			Name:         spec.NamePrefix + " · " + label,
+			Name:         spec.Group + " · " + label,
+			Group:        spec.Group,
 			Enabled:      spec.Enabled,
 			AuthIndex:    authIndex,
 			AccountName:  label,
@@ -601,12 +627,16 @@ func listLogsUnlocked(limit int) ([]LogEntry, error) {
 	defer f.Close()
 
 	logs := make([]LogEntry, 0, limit)
+	cutoff := time.Now().Add(-logRetentionWindow)
 	scanner := bufio.NewScanner(f)
 	buf := make([]byte, 64*1024)
 	scanner.Buffer(buf, 1024*1024)
 	for scanner.Scan() {
 		var e LogEntry
 		if json.Unmarshal(scanner.Bytes(), &e) != nil {
+			continue
+		}
+		if e.At.Before(cutoff) {
 			continue
 		}
 		logs = append(logs, e)

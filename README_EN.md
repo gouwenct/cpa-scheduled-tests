@@ -14,11 +14,12 @@ The screenshot shows an earlier UI; current releases also include bulk plan crea
 
 - Per-account scheduled tests: **Account + Model + Cron + Timezone + Prompt**
 - **Bulk-create plans for all Codex accounts** with duplicate detection
-- Per-plan **Run Now**
-- Quick send to one account/model
+- Per-plan **Run Now** and pause/resume controls, with 10 plans per page
+- Plans are organized by **group**, with dropdown defaults for account and model; Cron remains free-form
+- Timezones accept suggestions or any valid IANA timezone. New plans default to the browser timezone; editing preserves the saved timezone.
 - **Send to all accounts now**, including records currently marked disabled/unavailable
-- Model suggestions synchronized from CPA Codex model definitions, while still allowing manual model input
-- Persistent JSONL execution logs with trigger, account, model, HTTP status, latency and error category
+- Model options synchronized from CPA Codex model definitions
+- Persistent JSONL execution logs with trigger, account, model, HTTP status, latency and error category; the UI keeps only the latest two days
 - Runs fully inside the CPA process; no Windows Task Scheduler or resident PowerShell/Python/Node service is required
 
 ## Install
