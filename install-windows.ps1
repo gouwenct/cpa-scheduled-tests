@@ -22,7 +22,7 @@ $ZigRoot = Join-Path $ToolDir "zig-x86_64-windows-$ZigVersion"
 $ZigExe = Join-Path $ZigRoot "zig.exe"
 $CCWrapper = Join-Path $ToolDir "zigcc.cmd"
 $Dll = Join-Path $DistDir "cpa-scheduled-tests.dll"
-$Package = Join-Path $DistDir "cpa-scheduled-tests_0.1.3_windows_amd64.zip"
+$Package = Join-Path $DistDir "cpa-scheduled-tests_0.1.4_windows_amd64.zip"
 
 function Download-IfMissing {
     param([string]$Url, [string]$Path)

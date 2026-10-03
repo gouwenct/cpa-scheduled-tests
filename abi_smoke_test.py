@@ -1,9 +1,9 @@
-import base64, ctypes, json, os, time
+import base64, ctypes, json, os, sys, tempfile, time
 from ctypes import *
 
-SO = os.path.join(os.path.dirname(__file__), 'dist', 'cpa-scheduled-tests.so')
+SO = os.path.abspath(sys.argv[1]) if len(sys.argv) > 1 else os.path.join(os.path.dirname(__file__), 'dist', 'cpa-scheduled-tests.so')
 lib = ctypes.CDLL(SO)
-libc = ctypes.CDLL(None)
+libc = ctypes.CDLL('msvcrt.dll') if os.name == 'nt' else ctypes.CDLL(None)
 libc.malloc.restype = c_void_p
 libc.malloc.argtypes = [c_size_t]
 libc.free.argtypes = [c_void_p]
@@ -82,7 +82,8 @@ def call(method, payload=None):
     assert obj.get('ok') is True, (method, obj)
     return obj['result']
 
-reg = call('plugin.register', {'schema_version': 6})
+test_data = tempfile.TemporaryDirectory()
+reg = call('plugin.register', {'schema_version': 6, 'plugin_dir': test_data.name})
 assert reg['schema_version'] == 6
 assert reg['metadata']['Name'] == 'CPA Scheduled Tests'
 assert reg['metadata']['GitHubRepository']
@@ -145,4 +146,5 @@ seen = {x['auth_index'] for x in logs['logs'][:2]}
 assert {'a1','b2'}.issubset(seen), seen
 assert any(x.get('disabled') for x in logs['logs'] if x['auth_index']=='b2')
 plugin.shutdown()
+test_data.cleanup()
 print('ABI smoke test passed: registration, state, bulk plan create+dedupe, run-all, disabled account inclusion, logs')

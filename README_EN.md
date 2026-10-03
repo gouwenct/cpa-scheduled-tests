@@ -42,6 +42,17 @@ On Windows x64, place the DLL at:
 plugins/windows/amd64/cpa-scheduled-tests.dll
 ```
 
+For other platforms, use the matching ZIP and install the root library at:
+
+| Platform | Architecture | Path |
+| --- | --- | --- |
+| Linux | amd64 | `plugins/linux/amd64/cpa-scheduled-tests.so` |
+| Linux | arm64 | `plugins/linux/arm64/cpa-scheduled-tests.so` |
+| macOS | amd64 | `plugins/darwin/amd64/cpa-scheduled-tests.dylib` |
+| macOS | arm64 | `plugins/darwin/arm64/cpa-scheduled-tests.dylib` |
+
+Download from the [latest release](https://github.com/gouwenct/cpa-scheduled-tests/releases/latest) and verify the ZIP against that release's `checksums.txt`.
+
 Then fully restart CPA and open **Scheduled Tests** in the Management Center.
 
 ## Agent-assisted installation
@@ -65,3 +76,9 @@ Runs every day at 06:00, 11:00, 16:00 and 21:00 in the plan's configured timezon
 ## License
 
 MIT
+
+## Build and release
+
+On Linux or macOS, install Go 1.23+, Python 3 and a C compiler (GCC or Xcode Command Line Tools), then run `bash build-linux.sh`. It builds the native shared library, runs the fake-host ABI smoke test, and writes the platform ZIP and SHA-256 checksum. Windows can use `python build-release.py` with Go and GCC on PATH.
+
+The [platform build workflow](.github/workflows/build-release.yml) runs tests, vet, native library builds and ABI smoke tests for Darwin amd64/arm64, Linux amd64/arm64 and Windows amd64. Ordinary pushes produce a `release-bundle` artifact. A matching version tag publishes the complete release only after all five platforms pass.

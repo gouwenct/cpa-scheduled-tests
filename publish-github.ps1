@@ -75,7 +75,7 @@ try {
     & git diff --cached --quiet
     $hasChanges = ($LASTEXITCODE -ne 0)
     if ($hasChanges -or -not $hasHead) {
-        & git commit -m "Initial release: CPA Scheduled Tests v0.1.3"
+        & git commit -m "Initial release: CPA Scheduled Tests v0.1.4"
     }
 
     & gh repo view $repoSlug *> $null
@@ -97,14 +97,17 @@ try {
     }
 
     if ($CreateRelease) {
-        $tag = "v0.1.3"
+        $tag = "v0.1.4"
         & gh release view $tag --repo $repoSlug *> $null
         if ($LASTEXITCODE -ne 0) {
             $assets = @()
-            $winZip = Join-Path $PSScriptRoot "dist\cpa-scheduled-tests_0.1.3_windows_amd64.zip"
-            $linuxZip = Join-Path $PSScriptRoot "dist\cpa-scheduled-tests_0.1.3_linux_amd64.zip"
-            if (Test-Path $winZip) { $assets += $winZip }
-            if (Test-Path $linuxZip) { $assets += $linuxZip }
+            foreach ($platform in @("darwin_amd64", "darwin_arm64", "linux_amd64", "linux_arm64", "windows_amd64")) {
+                $package = Join-Path $PSScriptRoot "dist\cpa-scheduled-tests_0.1.4_$platform.zip"
+                if (-not (Test-Path -LiteralPath $package)) {
+                    throw "Missing full-platform asset: $package. Use the platform-builds GitHub Actions workflow."
+                }
+                $assets += $package
+            }
             $checksumPath = Join-Path $PSScriptRoot "dist\checksums.txt"
             $checksumLines = @($assets | ForEach-Object { (Get-FileHash -LiteralPath $_ -Algorithm SHA256).Hash.ToLowerInvariant() + "  " + [IO.Path]::GetFileName($_) })
             if ($checksumLines.Count -gt 0) {
@@ -112,7 +115,7 @@ try {
                 $assets += $checksumPath
             }
 
-            $args = @("release", "create", $tag, "--repo", $repoSlug, "--title", "CPA Scheduled Tests v0.1.3", "--generate-notes")
+            $args = @("release", "create", $tag, "--repo", $repoSlug, "--title", "CPA Scheduled Tests v0.1.4", "--generate-notes")
             $args += $assets
             & gh @args
             if ($LASTEXITCODE -ne 0) { throw "GitHub Release creation failed." }

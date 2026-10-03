@@ -23,7 +23,7 @@ English version: [README_EN.md](README_EN.md)
 
 “全部账号立即发送”是**强制真实请求**，不会判断该账号的 5 小时窗口是否已经开启，因此会产生极小的真实模型请求消耗。对于 `disabled` / `unavailable` 的 auth 文件，插件仍会尝试读取凭据并请求；若 token 已失效，会记录 `auth_error`，不会偷偷修改 CPA 账号状态。
 
-当前 v0.1.3 专门面向 **Codex / ChatGPT OAuth auth**。UI 会通过 CPA 的 `model-definitions/codex` 自动同步当前模型列表作为下拉选项。
+当前 v0.1.4 专门面向 **Codex / ChatGPT OAuth auth**。UI 会通过 CPA 的 `model-definitions/codex` 自动同步当前模型列表作为下拉选项。
 
 ## UI
 
@@ -79,7 +79,17 @@ plugins:
       priority: 1
 ```
 
-Windows x64 DLL 放到：
+各平台动态库放到对应目录（`amd64` 表示 Intel/AMD 64 位，`arm64` 包括 Apple Silicon）：
+
+| 平台 | 架构 | 安装位置 |
+| --- | --- | --- |
+| Windows | amd64 | `plugins/windows/amd64/cpa-scheduled-tests.dll` |
+| Linux | amd64 | `plugins/linux/amd64/cpa-scheduled-tests.so` |
+| Linux | arm64 | `plugins/linux/arm64/cpa-scheduled-tests.so` |
+| macOS | amd64 | `plugins/darwin/amd64/cpa-scheduled-tests.dylib` |
+| macOS | arm64 | `plugins/darwin/arm64/cpa-scheduled-tests.dylib` |
+
+Windows 示例：
 
 ```text
 plugins/windows/amd64/cpa-scheduled-tests.dll
@@ -115,7 +125,21 @@ plugins/cpa-scheduled-tests.dll
 完成后请用中文报告：已执行操作、验证结果、注意事项、未执行操作。
 ```
 
-当前 Windows x64 安装包：[v0.1.3 Release](https://github.com/gouwenct/cpa-scheduled-tests/releases/tag/v0.1.3)。
+安装包请从 [最新 Release](https://github.com/gouwenct/cpa-scheduled-tests/releases/latest) 下载与系统、架构一致的 ZIP，并使用同一 Release 的 `checksums.txt` 校验 SHA-256。
+
+## macOS / Linux 构建与完整平台发布
+
+原生构建需要 Go 1.23+、Python 3 和 C 编译器。macOS 使用 Xcode Command Line Tools；Linux 使用 GCC。运行：
+
+```sh
+bash build-linux.sh
+```
+
+该脚本也支持 macOS，按当前系统和架构输出 `.so` 或 `.dylib`、平台 ZIP 与 `checksums.txt`；会使用模拟 CPA 宿主验证动态库，不读取真实账号凭据。
+
+[GitHub Actions 构建流程](.github/workflows/build-release.yml) 在五个平台分别运行 Go 测试、`go vet` 和 ABI 模拟加载，汇总后生成含五个 ZIP 与完整校验清单的 `release-bundle`。
+
+普通推送只生成构建产物。推送与源码版本一致的 `v<版本号>` 标签后，五个平台全部通过且安装包校验成功，才会发布 GitHub Release。
 
 
 ## Windows 一键构建并安装
@@ -193,7 +217,7 @@ POST /plugins/cpa-scheduled-tests/logs/clear
 
 ```text
 dist\cpa-scheduled-tests.dll
-dist\cpa-scheduled-tests_0.1.3_windows_amd64.zip
+dist\cpa-scheduled-tests_0.1.4_windows_amd64.zip
 ```
 
 ## 安全设计
