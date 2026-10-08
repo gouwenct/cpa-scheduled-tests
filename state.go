@@ -86,21 +86,25 @@ type AuthFile struct {
 }
 
 type LogEntry struct {
-	ID           string    `json:"id"`
-	At           time.Time `json:"at"`
-	Trigger      string    `json:"trigger"`
-	PlanID       string    `json:"plan_id,omitempty"`
-	PlanName     string    `json:"plan_name,omitempty"`
-	AuthIndex    string    `json:"auth_index,omitempty"`
-	AccountName  string    `json:"account_name"`
-	AccountEmail string    `json:"account_email,omitempty"`
-	Disabled     bool      `json:"disabled,omitempty"`
-	Unavailable  bool      `json:"unavailable,omitempty"`
-	Model        string    `json:"model"`
-	Status       string    `json:"status"`
-	HTTPStatus   int       `json:"http_status,omitempty"`
-	LatencyMS    int64     `json:"latency_ms"`
-	Error        string    `json:"error,omitempty"`
+	ID                    string    `json:"id"`
+	At                    time.Time `json:"at"`
+	Trigger               string    `json:"trigger"`
+	PlanID                string    `json:"plan_id,omitempty"`
+	PlanName              string    `json:"plan_name,omitempty"`
+	AuthIndex             string    `json:"auth_index,omitempty"`
+	AccountName           string    `json:"account_name"`
+	AccountEmail          string    `json:"account_email,omitempty"`
+	Disabled              bool      `json:"disabled,omitempty"`
+	Unavailable           bool      `json:"unavailable,omitempty"`
+	Model                 string    `json:"model"`
+	Status                string    `json:"status"`
+	HTTPStatus            int       `json:"http_status,omitempty"`
+	FiveHourStatus        string    `json:"five_hour_status,omitempty"`
+	FiveHourUsedPercent   *float64  `json:"five_hour_used_percent,omitempty"`
+	FiveHourResetAt       string    `json:"five_hour_reset_at,omitempty"`
+	FiveHourWindowMinutes int       `json:"five_hour_window_minutes,omitempty"`
+	LatencyMS             int64     `json:"latency_ms"`
+	Error                 string    `json:"error,omitempty"`
 }
 
 type Job struct {
@@ -139,7 +143,7 @@ func defaultSettings() Settings {
 	return Settings{
 		DefaultTimezone: "Asia/Shanghai",
 		DefaultModel:    "gpt-5.6-luna",
-		DefaultPrompt:   "ping",
+		DefaultPrompt:   "你好",
 		BulkConcurrency: 4,
 		LogRetention:    5000,
 	}
@@ -300,7 +304,7 @@ func saveSettings(settings Settings) error {
 		return fmt.Errorf("default model is required")
 	}
 	if settings.DefaultPrompt == "" {
-		settings.DefaultPrompt = "ping"
+		settings.DefaultPrompt = "你好"
 	}
 	if settings.BulkConcurrency < 1 || settings.BulkConcurrency > 32 {
 		return fmt.Errorf("bulk_concurrency must be between 1 and 32")
@@ -349,7 +353,7 @@ func validatePlan(p *Plan) error {
 		return err
 	}
 	if p.Prompt == "" {
-		p.Prompt = "ping"
+		p.Prompt = "你好"
 	}
 	return nil
 }
@@ -423,7 +427,7 @@ func bulkCreatePlans(accounts []AuthFile, spec BulkPlanSpec) (BulkPlanResult, er
 		spec.Timezone = defaultSettings().DefaultTimezone
 	}
 	if spec.Prompt == "" {
-		spec.Prompt = "ping"
+		spec.Prompt = "你好"
 	}
 
 	// Validate the shared schedule once before mutating persistent state.

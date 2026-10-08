@@ -16,12 +16,12 @@ English version: [README_EN.md](README_EN.md)
 - 计划按 **分组** 管理，编辑和新建计划提供账号、Model 的下拉选择及默认值，Cron 保留自由输入；
 - 时区支持常用建议和任意有效 IANA 时区输入；新建计划默认使用浏览器时区，编辑时保留计划已保存的时区；
 - **一键向全部 Codex 账号发送**，遍历 `host.auth.list` 中的所有 Codex auth 记录，不因 `disabled` / `unavailable` 字段而跳过；
-- JSONL 持久化日志：时间、触发方式、账号、Model、HTTP 状态、延迟、错误分类；界面只显示最近两天；
+- JSONL 持久化日志：时间、触发方式、账号、Model、HTTP 状态、5 小时窗口状态、使用比例、重置时间、延迟和错误分类；界面只显示最近两天；
 - 全部功能运行在 CPA 进程内，无需 Windows Task Scheduler、PowerShell 常驻或外部服务。
 
 ## 重要说明
 
-“全部账号立即发送”是**强制真实请求**，不会判断该账号的 5 小时窗口是否已经开启，因此会产生极小的真实模型请求消耗。对于 `disabled` / `unavailable` 的 auth 文件，插件仍会尝试读取凭据并请求；若 token 已失效，会记录 `auth_error`，不会偷偷修改 CPA 账号状态。
+“全部账号立即发送”是**强制真实请求**，默认 Prompt 为“你好”。发送后会读取响应头中的五小时窗口数据；缺少明确数据时，使用同一账号凭据查询上游额度接口。日志显示发送后的窗口快照：确认 300 分钟窗口已有用量且重置时间未到，为“已开启”；用量达到 100% 时为“已开启 · 额度耗尽”；缺少数据或旧日志为“未知”。HTTP 200 本身不作为窗口开启的证据。该操作会产生极小的真实模型请求消耗。对于 `disabled` / `unavailable` 的 auth 文件，插件仍会尝试读取凭据并请求；若 token 已失效，会记录 `auth_error`，不会偷偷修改 CPA 账号状态。
 
 当前 v0.1.4 专门面向 **Codex / ChatGPT OAuth auth**。UI 会通过 CPA 的 `model-definitions/codex` 自动同步当前模型列表作为下拉选项。
 

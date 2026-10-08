@@ -4,11 +4,14 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"math"
+	"strconv"
 	"strings"
 	"time"
 )
 
 const codexResponsesURL = "https://chatgpt.com/backend-api/codex/responses"
+const codexUsageURL = "https://chatgpt.com/backend-api/wham/usage"
 
 type hostHTTPRequest struct {
 	Method  string
@@ -21,6 +24,13 @@ type hostHTTPResponse struct {
 	StatusCode int
 	Headers    map[string][]string
 	Body       []byte
+}
+
+type codexQuotaInfo struct {
+	Status        string
+	UsedPercent   *float64
+	ResetAt       string
+	WindowMinutes int
 }
 
 type authMaterial struct {
@@ -229,7 +239,7 @@ func sendCodexRequest(a AuthFile, model, prompt, trigger, planID, planName strin
 		return entry
 	}
 	if strings.TrimSpace(prompt) == "" {
-		prompt = "ping"
+		prompt = "你好"
 	}
 
 	rawAuth, err := getAuthJSON(a.AuthIndex)
@@ -287,6 +297,21 @@ func sendCodexRequest(a AuthFile, model, prompt, trigger, planID, planName strin
 
 	entry.HTTPStatus = resp.StatusCode
 	detail := parseUpstreamMessage(resp.Body)
+	quota := parseCodexQuotaHeaders(resp.Headers, time.Now())
+	if quota.Status == "unknown" {
+		usageHeaders := map[string][]string{"Accept": {"application/json"}, "Authorization": {"Bearer " + material.AccessToken}}
+		if material.AccountID != "" {
+			usageHeaders["Chatgpt-Account-Id"] = []string{material.AccountID}
+		}
+		var usage hostHTTPResponse
+		if callHost("host.http.do", hostHTTPRequest{Method: "GET", URL: codexUsageURL, Headers: usageHeaders}, &usage) == nil && usage.StatusCode == 200 {
+			quota = parseCodexUsage(usage.Body, time.Now())
+		}
+	}
+	entry.FiveHourStatus = quota.Status
+	entry.FiveHourUsedPercent = quota.UsedPercent
+	entry.FiveHourResetAt = quota.ResetAt
+	entry.FiveHourWindowMinutes = quota.WindowMinutes
 	switch {
 	case resp.StatusCode >= 200 && resp.StatusCode <= 299:
 		entry.Status = "success"
@@ -310,6 +335,73 @@ func sendCodexRequest(a AuthFile, model, prompt, trigger, planID, planName strin
 		entry.Error = fallbackDetail(detail, fmt.Sprintf("HTTP %d", resp.StatusCode))
 	}
 	return entry
+}
+
+func parseCodexQuotaHeaders(headers map[string][]string, now time.Time) codexQuotaInfo {
+	for _, window := range []string{"primary", "secondary"} {
+		prefix := "x-codex-" + window + "-"
+		minutes, _ := strconv.Atoi(strings.TrimSpace(firstHeader(headers, prefix+"window-minutes")))
+		if minutes != 300 {
+			continue
+		}
+		used, err := strconv.ParseFloat(strings.TrimSpace(firstHeader(headers, prefix+"used-percent")), 64)
+		if err != nil {
+			return codexQuotaInfo{Status: "unknown"}
+		}
+		reset, _ := strconv.ParseInt(strings.TrimSpace(firstHeader(headers, prefix+"reset-at")), 10, 64)
+		return codexWindowInfo(&used, reset, now)
+	}
+	return codexQuotaInfo{Status: "unknown"}
+}
+
+func parseCodexUsage(body []byte, now time.Time) codexQuotaInfo {
+	type window struct {
+		Seconds int      `json:"limit_window_seconds"`
+		Used    *float64 `json:"used_percent"`
+		Reset   int64    `json:"reset_at"`
+	}
+	var usage struct {
+		RateLimit struct {
+			Primary   *window `json:"primary_window"`
+			Secondary *window `json:"secondary_window"`
+		} `json:"rate_limit"`
+	}
+	if json.Unmarshal(body, &usage) == nil {
+		for _, w := range []*window{usage.RateLimit.Primary, usage.RateLimit.Secondary} {
+			if w != nil && w.Seconds == 18000 {
+				return codexWindowInfo(w.Used, w.Reset, now)
+			}
+		}
+	}
+	return codexQuotaInfo{Status: "unknown"}
+}
+
+func codexWindowInfo(used *float64, reset int64, now time.Time) codexQuotaInfo {
+	info := codexQuotaInfo{Status: "unknown", WindowMinutes: 300}
+	if used == nil || math.IsNaN(*used) || math.IsInf(*used, 0) || *used < 0 || *used > 100 {
+		return info
+	}
+	info.UsedPercent = used
+	if reset > 0 {
+		info.ResetAt = time.Unix(reset, 0).UTC().Format(time.RFC3339)
+	}
+	if reset > now.Unix() && *used > 0 {
+		info.Status = "open"
+		if *used == 100 {
+			info.Status = "exhausted"
+		}
+	}
+	return info
+}
+
+func firstHeader(headers map[string][]string, name string) string {
+	for key, values := range headers {
+		if !strings.EqualFold(key, name) || len(values) == 0 {
+			continue
+		}
+		return values[0]
+	}
+	return ""
 }
 
 func parseUpstreamMessage(body []byte) string {

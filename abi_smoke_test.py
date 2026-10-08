@@ -49,7 +49,21 @@ def host_call(ctx, method, req_ptr, req_len, out):
         return 0
     if method == 'host.http.do':
         http_calls.append(payload)
-        alloc_json({'StatusCode':200,'Headers':{},'Body':base64.b64encode(b'data: ok').decode()}, out)
+        if payload.get('Method') == 'GET':
+            assert payload['URL'] == 'https://chatgpt.com/backend-api/wham/usage', payload['URL']
+            body = {'rate_limit': {'primary_window': {
+                'limit_window_seconds': 18000, 'used_percent': 25.0, 'reset_at': 4102444800,
+            }}}
+            alloc_json({'StatusCode':200,'Headers':{},'Body':base64.b64encode(json.dumps(body).encode()).decode()}, out)
+            return 0
+        assert payload['URL'] == 'https://chatgpt.com/backend-api/codex/responses'
+        request_body = json.loads(base64.b64decode(payload['Body']))
+        assert request_body['input'][0]['content'][0]['text'] == '你好', request_body
+        alloc_json({'StatusCode':200,'Headers':{
+            'x-codex-primary-used-percent':['25.0'],
+            'x-codex-primary-window-minutes':['300'],
+            'x-codex-primary-reset-at':['4102444800'],
+        } if payload['Headers']['Authorization'] == ['Bearer token-a1'] else {},'Body':base64.b64encode(b'data: ok').decode()}, out)
         return 0
     if method == 'host.log':
         alloc_json({'logged': True}, out)
@@ -127,7 +141,7 @@ status, bulk2 = mgmt('POST','/plugins/cpa-scheduled-tests/plans/bulk-create', {
 assert status == 200 and bulk2['created'] == 0 and bulk2['skipped'] == 2, bulk2
 status, st = mgmt('GET','/plugins/cpa-scheduled-tests/state')
 assert len(st['plans']) == 2, st['plans']
-status, accepted = mgmt('POST','/plugins/cpa-scheduled-tests/run-all', {'model':'gpt-test','prompt':'ping'})
+status, accepted = mgmt('POST','/plugins/cpa-scheduled-tests/run-all', {'model':'gpt-test','prompt':''})
 assert status == 202, (status, accepted)
 for _ in range(80):
     time.sleep(0.05)
@@ -138,13 +152,17 @@ else:
     raise AssertionError('bulk job did not finish')
 assert st['jobs'][0]['total'] == 2
 assert st['jobs'][0]['succeeded'] == 2
-assert len(http_calls) == 2, http_calls
+assert len(http_calls) == 3, http_calls
+assert sum(x['Method'] == 'POST' for x in http_calls) == 2
+assert sum(x['Method'] == 'GET' for x in http_calls) == 1
 status, logs = mgmt('GET','/plugins/cpa-scheduled-tests/logs', query={'limit':['20']})
 assert status == 200
 assert len(logs['logs']) >= 2
 seen = {x['auth_index'] for x in logs['logs'][:2]}
 assert {'a1','b2'}.issubset(seen), seen
 assert any(x.get('disabled') for x in logs['logs'] if x['auth_index']=='b2')
+assert all(x.get('five_hour_status') == 'open' for x in logs['logs'][:2]), logs['logs'][:2]
+assert all(x.get('five_hour_used_percent') == 25.0 for x in logs['logs'][:2]), logs['logs'][:2]
 plugin.shutdown()
 test_data.cleanup()
 print('ABI smoke test passed: registration, state, bulk plan create+dedupe, run-all, disabled account inclusion, logs')

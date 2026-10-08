@@ -17,10 +17,12 @@ The screenshot shows an earlier UI; current releases also include bulk plan crea
 - Per-plan **Run Now** and pause/resume controls, with 10 plans per page
 - Plans are organized by **group**, with dropdown defaults for account and model; Cron remains free-form
 - Timezones accept suggestions or any valid IANA timezone. New plans default to the browser timezone; editing preserves the saved timezone.
-- **Send to all accounts now**, including records currently marked disabled/unavailable
+- **Send to all accounts now**, including records currently marked disabled/unavailable; the default prompt is `你好`
 - Model options synchronized from CPA Codex model definitions
-- Persistent JSONL execution logs with trigger, account, model, HTTP status, latency and error category; the UI keeps only the latest two days
+- Persistent JSONL execution logs with trigger, account, model, HTTP status, five-hour window status, usage percentage, reset time, latency and error category; the UI keeps only the latest two days
 - Runs fully inside the CPA process; no Windows Task Scheduler or resident PowerShell/Python/Node service is required
+
+The five-hour status is a snapshot after sending. The plugin reads the 300-minute quota window from response headers, with a per-account upstream usage query as fallback. Positive usage and a future reset time confirm an open window; 100% usage means the open window is exhausted. Missing evidence and old logs show Unknown. HTTP 200 alone does not confirm an open window.
 
 ## Install
 
