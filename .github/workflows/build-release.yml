@@ -118,4 +118,4 @@ jobs:
           RELEASE_TAG: ${{ github.ref_name }}
         run: >-
           gh release create "$RELEASE_TAG" dist/*.zip dist/checksums.txt
-          --verify-tag --title "CPA Scheduled Tests $RELEASE_TAG" --generate-notes
+          --verify-tag --title "CPA Scheduled 5H $RELEASE_TAG" --generate-notes

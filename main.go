@@ -76,7 +76,7 @@ import (
 
 const (
 	pluginID                      = "cpa-scheduled-tests"
-	pluginVersion                 = "0.1.4"
+	pluginVersion                 = "0.1.5"
 	supportedSchemaVersion uint32 = 6
 )
 
@@ -221,11 +221,11 @@ func registration(hostSchemaVersion uint32) registrationResult {
 	return registrationResult{
 		SchemaVersion: int(schemaVersion),
 		Metadata: registrationMetadata{
-			Name:             "CPA Scheduled Tests",
+			Name:             "CPA Scheduled 5H",
 			Version:          pluginVersion,
 			Author:           "gouwenct",
 			GitHubRepository: "https://github.com/gouwenct/cpa-scheduled-tests",
-			Description:      "Sub2API-style scheduled per-account Codex test plans with model selection, persistent logs, quick send, and send-all-now.",
+			Description:      "Scheduled per-account Codex requests with five-hour window evidence, model selection, persistent logs, and send-all-now.",
 			ConfigFields:     []configField{},
 		},
 		Capabilities: registrationCapability{ManagementAPI: true},
@@ -244,7 +244,7 @@ func managementRegistrationResult() managementRegistration {
 		{Method: "GET", Path: "/plugins/" + pluginID + "/logs", Description: "Return recent persistent execution logs."},
 		{Method: "POST", Path: "/plugins/" + pluginID + "/logs/clear", Description: "Clear persistent execution logs."},
 	}
-	resources := []resourceRoute{{Path: "/panel", Menu: "Scheduled Tests", Description: "Manage scheduled account/model tests and run immediate requests."}}
+	resources := []resourceRoute{{Path: "/panel", Menu: "CPA Scheduled 5H", Description: "Manage scheduled account/model tests and run immediate requests."}}
 	return managementRegistration{Routes: routes, Resources: resources}
 }
 

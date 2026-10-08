@@ -75,7 +75,7 @@ try {
     & git diff --cached --quiet
     $hasChanges = ($LASTEXITCODE -ne 0)
     if ($hasChanges -or -not $hasHead) {
-        & git commit -m "Initial release: CPA Scheduled Tests v0.1.4"
+        & git commit -m "Initial release: CPA Scheduled 5H v0.1.5"
     }
 
     & gh repo view $repoSlug *> $null
@@ -97,12 +97,12 @@ try {
     }
 
     if ($CreateRelease) {
-        $tag = "v0.1.4"
+        $tag = "v0.1.5"
         & gh release view $tag --repo $repoSlug *> $null
         if ($LASTEXITCODE -ne 0) {
             $assets = @()
             foreach ($platform in @("darwin_amd64", "darwin_arm64", "linux_amd64", "linux_arm64", "windows_amd64")) {
-                $package = Join-Path $PSScriptRoot "dist\cpa-scheduled-tests_0.1.4_$platform.zip"
+                $package = Join-Path $PSScriptRoot "dist\cpa-scheduled-tests_0.1.5_$platform.zip"
                 if (-not (Test-Path -LiteralPath $package)) {
                     throw "Missing full-platform asset: $package. Use the platform-builds GitHub Actions workflow."
                 }
@@ -115,7 +115,7 @@ try {
                 $assets += $checksumPath
             }
 
-            $args = @("release", "create", $tag, "--repo", $repoSlug, "--title", "CPA Scheduled Tests v0.1.4", "--generate-notes")
+            $args = @("release", "create", $tag, "--repo", $repoSlug, "--title", "CPA Scheduled 5H v0.1.5", "--generate-notes")
             $args += $assets
             & gh @args
             if ($LASTEXITCODE -ne 0) { throw "GitHub Release creation failed." }

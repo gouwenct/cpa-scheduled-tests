@@ -99,7 +99,7 @@ def call(method, payload=None):
 test_data = tempfile.TemporaryDirectory()
 reg = call('plugin.register', {'schema_version': 6, 'plugin_dir': test_data.name})
 assert reg['schema_version'] == 6
-assert reg['metadata']['Name'] == 'CPA Scheduled Tests'
+assert reg['metadata']['Name'] == 'CPA Scheduled 5H'
 assert reg['metadata']['GitHubRepository']
 mg = call('management.register')
 assert any(r['Path'].endswith('/run-all') for r in mg['routes'])

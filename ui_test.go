@@ -15,7 +15,7 @@ func TestPanelGitHubLink(t *testing.T) {
 		`id="planGroup"`,
 		`id="planModel"`,
 		`id="planTimezone"`,
-		`<div class="title"><h1>Scheduled Tests</h1>`,
+		`<div class="title"><h1>CPA Scheduled 5H</h1>`,
 		`id="planPagination"`,
 		`onclick="togglePlan(`,
 		`function fmtTime(s){`,

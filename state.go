@@ -182,7 +182,7 @@ func ensureRuntime(pluginDir string) error {
 	rt.initialized = true
 
 	go schedulerLoop(ctx)
-	hostLog("info", "CPA Scheduled Tests started", map[string]string{"data_dir": dataDir})
+	hostLog("info", "CPA Scheduled 5H started", map[string]string{"data_dir": dataDir})
 	return nil
 }
 

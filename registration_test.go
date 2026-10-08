@@ -13,6 +13,9 @@ func TestRegistrationHasRequiredMetadataAndManagementCapability(t *testing.T) {
 	if !reg.Capabilities.ManagementAPI {
 		t.Fatal("management_api capability must be enabled")
 	}
+	if reg.Metadata.Name != "CPA Scheduled 5H" || pluginID != "cpa-scheduled-tests" {
+		t.Fatal("new display name must preserve the installed plugin ID")
+	}
 }
 
 func TestRegistrationSchemaNegotiation(t *testing.T) {

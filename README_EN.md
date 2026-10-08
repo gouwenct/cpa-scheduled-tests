@@ -1,4 +1,6 @@
-# CPA Scheduled Tests
+# CPA Scheduled 5H
+
+<img src="assets/logo.png" alt="5H OPEN" width="128">
 
 Native CLIProxyAPI (CPA) plugin for Sub2API-style scheduled Codex tests.
 
@@ -55,7 +57,7 @@ For other platforms, use the matching ZIP and install the root library at:
 
 Download from the [latest release](https://github.com/gouwenct/cpa-scheduled-tests/releases/latest) and verify the ZIP against that release's `checksums.txt`.
 
-Then fully restart CPA and open **Scheduled Tests** in the Management Center.
+Then fully restart CPA and open **CPA Scheduled 5H** in the Management Center.
 
 ## Agent-assisted installation
 

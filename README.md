@@ -1,4 +1,6 @@
-# CPA Scheduled Tests
+# CPA Scheduled 5H
+
+<img src="assets/logo.png" alt="5H OPEN" width="128">
 
 English version: [README_EN.md](README_EN.md)
 
@@ -23,13 +25,13 @@ English version: [README_EN.md](README_EN.md)
 
 “全部账号立即发送”是**强制真实请求**，默认 Prompt 为“你好”。发送后会读取响应头中的五小时窗口数据；缺少明确数据时，使用同一账号凭据查询上游额度接口。日志显示发送后的窗口快照：确认 300 分钟窗口已有用量且重置时间未到，为“已开启”；用量达到 100% 时为“已开启 · 额度耗尽”；缺少数据或旧日志为“未知”。HTTP 200 本身不作为窗口开启的证据。该操作会产生极小的真实模型请求消耗。对于 `disabled` / `unavailable` 的 auth 文件，插件仍会尝试读取凭据并请求；若 token 已失效，会记录 `auth_error`，不会偷偷修改 CPA 账号状态。
 
-当前 v0.1.4 专门面向 **Codex / ChatGPT OAuth auth**。UI 会通过 CPA 的 `model-definitions/codex` 自动同步当前模型列表作为下拉选项。
+当前 v0.1.5 专门面向 **Codex / ChatGPT OAuth auth**。UI 会通过 CPA 的 `model-definitions/codex` 自动同步当前模型列表作为下拉选项。
 
 ## UI
 
 安装后在 CPA Management Center 侧栏打开：
 
-**Scheduled Tests**
+**CPA Scheduled 5H**
 
 或者直接访问：
 
@@ -108,7 +110,7 @@ plugins/cpa-scheduled-tests.dll
 把下面的提示词直接发给你的 Agent。它会优先使用中文，并在替换 DLL 前检查版本、备份旧文件和校验下载包：
 
 ```text
-请使用中文帮助我安装或更新 CPA Scheduled Tests 插件到最新版本。
+请使用中文帮助我安装或更新 CPA Scheduled 5H 插件到最新版本。
 
 目标：
 - 仓库：https://github.com/gouwenct/cpa-scheduled-tests
@@ -162,7 +164,7 @@ Set-ExecutionPolicy -Scope Process Bypass
   -ManagementKey '你的ManagementKey'
 ```
 
-安装后完整重启一次 CPA，然后在侧栏进入 **Scheduled Tests**。
+安装后完整重启一次 CPA，然后在侧栏进入 **CPA Scheduled 5H**。
 
 ## 数据位置
 
@@ -217,7 +219,7 @@ POST /plugins/cpa-scheduled-tests/logs/clear
 
 ```text
 dist\cpa-scheduled-tests.dll
-dist\cpa-scheduled-tests_0.1.4_windows_amd64.zip
+dist\cpa-scheduled-tests_0.1.5_windows_amd64.zip
 ```
 
 ## 安全设计
