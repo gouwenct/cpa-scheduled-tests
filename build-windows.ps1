@@ -19,7 +19,7 @@ $dll = Join-Path $PSScriptRoot 'dist\cpa-scheduled-tests.dll'
 if ($LASTEXITCODE -ne 0) { throw 'go build failed' }
 Remove-Item 'dist\cpa-scheduled-tests.h' -ErrorAction SilentlyContinue
 
-$zip = Join-Path $PSScriptRoot 'dist\cpa-scheduled-tests_0.1.5_windows_amd64.zip'
+$zip = Join-Path $PSScriptRoot 'dist\cpa-scheduled-tests_0.1.6_windows_amd64.zip'
 Remove-Item $zip -ErrorAction SilentlyContinue
 Compress-Archive -Path $dll -DestinationPath $zip
 $checksum = (Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash.ToLowerInvariant()

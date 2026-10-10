@@ -25,25 +25,26 @@ type Settings struct {
 }
 
 type Plan struct {
-	ID               string    `json:"id"`
-	Name             string    `json:"name"`
-	Group            string    `json:"group,omitempty"`
-	Enabled          bool      `json:"enabled"`
-	AuthIndex        string    `json:"auth_index"`
-	AccountName      string    `json:"account_name,omitempty"`
-	AccountEmail     string    `json:"account_email,omitempty"`
-	Model            string    `json:"model"`
-	Cron             string    `json:"cron"`
-	Timezone         string    `json:"timezone"`
-	Prompt           string    `json:"prompt"`
-	CreatedAt        time.Time `json:"created_at"`
-	UpdatedAt        time.Time `json:"updated_at"`
-	LastRunAt        time.Time `json:"last_run_at,omitempty"`
-	LastStatus       string    `json:"last_status,omitempty"`
-	LastHTTPStatus   int       `json:"last_http_status,omitempty"`
-	LastLatencyMS    int64     `json:"last_latency_ms,omitempty"`
-	LastError        string    `json:"last_error,omitempty"`
-	LastScheduledKey string    `json:"last_scheduled_key,omitempty"`
+	ID                     string    `json:"id"`
+	Name                   string    `json:"name"`
+	Group                  string    `json:"group,omitempty"`
+	Enabled                bool      `json:"enabled"`
+	AuthIndex              string    `json:"auth_index"`
+	AccountName            string    `json:"account_name,omitempty"`
+	AccountEmail           string    `json:"account_email,omitempty"`
+	Model                  string    `json:"model"`
+	Cron                   string    `json:"cron"`
+	Timezone               string    `json:"timezone"`
+	Prompt                 string    `json:"prompt"`
+	CreatedAt              time.Time `json:"created_at"`
+	UpdatedAt              time.Time `json:"updated_at"`
+	LastRunAt              time.Time `json:"last_run_at,omitempty"`
+	LastStatus             string    `json:"last_status,omitempty"`
+	LastHTTPStatus         int       `json:"last_http_status,omitempty"`
+	LastLatencyMS          int64     `json:"last_latency_ms,omitempty"`
+	LastError              string    `json:"last_error,omitempty"`
+	LastScheduledKey       string    `json:"last_scheduled_key,omitempty"`
+	LastScheduledRepeatKey string    `json:"last_scheduled_repeat_key,omitempty"`
 }
 
 type PersistentState struct {
@@ -385,6 +386,7 @@ func upsertPlan(p Plan) (Plan, error) {
 			p.LastLatencyMS = old.LastLatencyMS
 			p.LastError = old.LastError
 			p.LastScheduledKey = old.LastScheduledKey
+			p.LastScheduledRepeatKey = old.LastScheduledRepeatKey
 			rt.state.Plans[i] = p
 			if err := saveStateLocked(); err != nil {
 				return Plan{}, err
@@ -545,6 +547,9 @@ func updatePlanResult(planID string, entry LogEntry) {
 			continue
 		}
 		p := &rt.state.Plans[i]
+		if p.LastRunAt.After(entry.At) {
+			return
+		}
 		p.LastRunAt = entry.At
 		p.LastStatus = entry.Status
 		p.LastHTTPStatus = entry.HTTPStatus
@@ -556,7 +561,7 @@ func updatePlanResult(planID string, entry LogEntry) {
 	}
 }
 
-func markScheduled(planID, key string) bool {
+func markScheduled(planID, key string, repeat bool) bool {
 	rt.mu.Lock()
 	defer rt.mu.Unlock()
 	for i := range rt.state.Plans {
@@ -564,10 +569,14 @@ func markScheduled(planID, key string) bool {
 		if p.ID != planID {
 			continue
 		}
-		if p.LastScheduledKey == key {
+		lastKey := &p.LastScheduledKey
+		if repeat {
+			lastKey = &p.LastScheduledRepeatKey
+		}
+		if *lastKey == key {
 			return false
 		}
-		p.LastScheduledKey = key
+		*lastKey = key
 		_ = saveStateLocked()
 		return true
 	}

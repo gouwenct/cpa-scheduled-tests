@@ -1,4 +1,4 @@
-CPA Scheduled 5H v0.1.5 - Windows
+CPA Scheduled 5H v0.1.6 - Windows
 
 用途：
 - 账号 + Model + Cron 定时计划
@@ -24,7 +24,7 @@ CPA Scheduled 5H v0.1.5 - Windows
 
 4. 完整重启 CPA。
 5. 在 CPA 侧栏打开 CPA Scheduled 5H。
-6. 页面首次打开输入 CPA Management Key，点击“保存本会话”。
+6. 页面首次打开输入 CPA Management Key，点击“保持管理密钥”。
 
 示例 Cron：
 0 6,11,16,21 * * *

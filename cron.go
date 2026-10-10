@@ -149,7 +149,7 @@ func nextCronTime(expr, timezone string, after time.Time) (time.Time, error) {
 	t := after.In(loc).Truncate(time.Minute).Add(time.Minute)
 	deadline := t.AddDate(1, 0, 1)
 	for !t.After(deadline) {
-		if c.matches(t) {
+		if c.matches(t) || c.matches(t.Add(-time.Minute)) {
 			return t, nil
 		}
 		t = t.Add(time.Minute)

@@ -20,7 +20,7 @@ func panelHTML() string {
 <div class="wrap">
   <div class="top">
     <div class="title"><h1>CPA Scheduled 5H</h1><p>CPA 原生的账号 × 模型 × Cron 定时测试。支持单账号立即发送、全部账号强制发送和持久化日志。</p><a class="github-link" href="https://github.com/gouwenct/cpa-scheduled-tests" target="_blank" rel="noopener noreferrer" aria-label="在 GitHub 查看项目并点 Star（新标签页）"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .5a12 12 0 0 0-3.79 23.39c.6.11.82-.26.82-.58v-2.23c-3.34.73-4.04-1.42-4.04-1.42-.55-1.39-1.33-1.76-1.33-1.76-1.09-.75.08-.73.08-.73 1.2.09 1.84 1.23 1.84 1.23 1.07 1.83 2.81 1.3 3.49.99.11-.77.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.12-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.29-1.55 3.3-1.23 3.3-1.23.66 1.66.24 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.8 5.63-5.48 5.93.43.37.82 1.1.82 2.22v3.3c0 .32.22.69.83.57A12 12 0 0 0 12 .5Z"/></svg>GitHub · Star</a></div>
-    <div class="keybox"><input id="mgmtKey" type="password" autocomplete="off" placeholder="CPA Management Key"><button onclick="saveKey()">保存本会话</button><button onclick="loadModels(true)">同步模型</button><button class="primary" onclick="loadAll()">刷新</button>
+    <div class="keybox"><label for="mgmtKey" class="hint" style="flex-basis:100%;margin:0">请输入 CPA 管理密钥</label><input id="mgmtKey" type="password" autocomplete="off" placeholder="请输入管理密钥"><button onclick="saveKey()">保持管理密钥</button><button onclick="loadModels(true)">同步模型</button><button class="primary" onclick="loadAll()">刷新</button>
     <div class="cards">
     <div class="card"><div id="mAccounts" class="metric">-</div><div class="label">Codex 账号</div></div>
     <div class="card"><div id="mPlans" class="metric">-</div><div class="label">定时计划</div></div>
@@ -33,7 +33,7 @@ func panelHTML() string {
     <div class="sectionhead"><h2>定时测试计划</h2><div class="actions"><button onclick="openBulkPlan()">一键添加全部账号</button><button class="primary" onclick="openPlan()">+ 新建计划</button></div></div>
     <div class="tablewrap"><table><thead><tr><th>启用</th><th>分组</th><th>账号</th><th>Model</th><th>Cron</th><th>时区</th><th>下次执行</th><th>上次结果</th><th>操作</th></tr></thead><tbody id="planRows"></tbody></table></div>
     <div id="planPagination" class="plan-pagination"></div>
-    <div class="hint">Cron 为标准 5 段：分钟 小时 日 月 星期。例如 <span class="mono">0 6,11,16,21 * * *</span>。</div>
+    <div class="hint">Cron 为标准 5 段：分钟 小时 日 月 星期。例如 <span class="mono">0 6,11,16,21 * * *</span>。将在设定分钟 x 和 x+1 分钟各发送一次，提高五小时窗口开启成功率。</div>
   </div>
 
   <div class="section dangerbox">

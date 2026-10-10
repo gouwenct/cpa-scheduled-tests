@@ -14,7 +14,7 @@ The screenshot shows an earlier UI; current releases also include bulk plan crea
 
 ## Features
 
-- Per-account scheduled tests: **Account + Model + Cron + Timezone + Prompt**
+- Per-account scheduled tests: **Account + Model + Cron + Timezone + Prompt**. Each Cron occurrence sends once in the configured minute and again in the following minute, regardless of the first result. Both results are logged; the second is marked `scheduled+1min`. Manual sends remain single requests. This improves activation reliability but cannot bypass upstream quota limits.
 - **Bulk-create plans for all Codex accounts** with duplicate detection
 - Per-plan **Run Now** and pause/resume controls, with 10 plans per page
 - Plans are organized by **group**, with dropdown defaults for account and model; Cron remains free-form

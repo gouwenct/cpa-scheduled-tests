@@ -24,6 +24,9 @@ func schedulerLoop(ctx context.Context) {
 }
 
 func evaluateSchedules(ctx context.Context, now time.Time) {
+	if ctx.Err() != nil {
+		return
+	}
 	state := snapshotPersistent()
 	for _, p := range state.Plans {
 		if !p.Enabled {
@@ -38,15 +41,21 @@ func evaluateSchedules(ctx context.Context, now time.Time) {
 			continue
 		}
 		local := now.In(loc)
-		if !cron.matches(local) {
-			continue
-		}
-		key := local.Format("2006-01-02T15:04")
-		if !markScheduled(p.ID, key) {
-			continue
-		}
-		if _, err := startPlanJob(p.ID, "scheduled"); err != nil {
-			hostLog("warn", "scheduled test was not started", map[string]string{"plan_id": p.ID, "error": err.Error()})
+		for _, repeat := range []bool{false, true} {
+			at, trigger := local, "scheduled"
+			if repeat {
+				at = local.Add(-time.Minute)
+				trigger = "scheduled+1min"
+			}
+			if ctx.Err() != nil {
+				return
+			}
+			if !cron.matches(at) || !markScheduled(p.ID, at.Format("2006-01-02T15:04"), repeat) {
+				continue
+			}
+			if _, err := startPlanJob(p.ID, trigger); err != nil {
+				hostLog("warn", "scheduled test was not started", map[string]string{"plan_id": p.ID, "trigger": trigger, "error": err.Error()})
+			}
 		}
 	}
 }
@@ -56,13 +65,20 @@ func startPlanJob(planID, trigger string) (string, error) {
 	if !ok {
 		return "", fmt.Errorf("plan not found")
 	}
-	job, err := beginJob("plan", p.ID, p.Model, "plan:"+p.ID)
+	activeKey := "plan:" + p.ID
+	switch trigger {
+	case "scheduled":
+		activeKey += ":scheduled:" + p.LastScheduledKey
+	case "scheduled+1min":
+		activeKey += ":scheduled+1min:" + p.LastScheduledRepeatKey
+	}
+	job, err := beginJob("plan", p.ID, p.Model, activeKey)
 	if err != nil {
 		return "", err
 	}
 	go func() {
 		errText := ""
-		defer func() { finishJob(job.ID, "plan:"+p.ID, errText) }()
+		defer func() { finishJob(job.ID, activeKey, errText) }()
 
 		a, err := findAccount(p.AuthIndex)
 		if err != nil {

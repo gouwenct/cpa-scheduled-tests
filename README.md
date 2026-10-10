@@ -12,7 +12,7 @@ English version: [README_EN.md](README_EN.md)
 
 一个原生 CLIProxyAPI（CPA）插件，按 Sub2API Scheduled Tests 的思路提供：
 
-- **账号 + Model + Cron** 的定时测试计划；
+- **账号 + Model + Cron** 的定时测试计划：每个 Cron 时刻在设定分钟和下一分钟各发送一次，无论第一次结果如何；
 - **一键为全部 Codex 账号创建定时计划**：统一指定 Model、Cron、时区和 Prompt，自动一账号一计划，并跳过完全重复计划；
 - 每个计划的 **立即发送、暂停/恢复**，计划表每页显示 10 条；
 - 计划按 **分组** 管理，编辑和新建计划提供账号、Model 的下拉选择及默认值，Cron 保留自由输入；
@@ -25,7 +25,7 @@ English version: [README_EN.md](README_EN.md)
 
 “全部账号立即发送”是**强制真实请求**，默认 Prompt 为“你好”。发送后会读取响应头中的五小时窗口数据；缺少明确数据时，使用同一账号凭据查询上游额度接口。日志显示发送后的窗口快照：确认 300 分钟窗口已有用量且重置时间未到，为“已开启”；用量达到 100% 时为“已开启 · 额度耗尽”；缺少数据或旧日志为“未知”。HTTP 200 本身不作为窗口开启的证据。该操作会产生极小的真实模型请求消耗。对于 `disabled` / `unavailable` 的 auth 文件，插件仍会尝试读取凭据并请求；若 token 已失效，会记录 `auth_error`，不会偷偷修改 CPA 账号状态。
 
-当前 v0.1.5 专门面向 **Codex / ChatGPT OAuth auth**。UI 会通过 CPA 的 `model-definitions/codex` 自动同步当前模型列表作为下拉选项。
+当前 v0.1.6 专门面向 **Codex / ChatGPT OAuth auth**。UI 会通过 CPA 的 `model-definitions/codex` 自动同步当前模型列表作为下拉选项。
 
 ## UI
 
@@ -42,6 +42,8 @@ http://127.0.0.1:8317/v0/resource/plugins/cpa-scheduled-tests/panel
 资源页面本身不携带敏感数据。首次打开请输入 CPA Management Key；它只保存到当前浏览器标签页的 `sessionStorage`。
 
 ## Cron
+
+只需填写一条 Cron。例如 `0 6,11,16,21 * * *` 会在每天 06:00/06:01、11:00/11:01、16:00/16:01、21:00/21:01 各发送一次。两次结果分别写入日志；第二次标为 `scheduled+1min`。跨小时、跨天仍按一分钟间隔处理。重复发送提高五小时窗口开启成功率，但不能保证绕过上游限流。手动立即发送仍只发送一次。
 
 使用标准 5 段数字 Cron：
 
@@ -219,7 +221,7 @@ POST /plugins/cpa-scheduled-tests/logs/clear
 
 ```text
 dist\cpa-scheduled-tests.dll
-dist\cpa-scheduled-tests_0.1.5_windows_amd64.zip
+dist\cpa-scheduled-tests_0.1.6_windows_amd64.zip
 ```
 
 ## 安全设计

@@ -76,7 +76,7 @@ import (
 
 const (
 	pluginID                      = "cpa-scheduled-tests"
-	pluginVersion                 = "0.1.5"
+	pluginVersion                 = "0.1.6"
 	supportedSchemaVersion uint32 = 6
 )
 
