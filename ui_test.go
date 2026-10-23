@@ -11,6 +11,8 @@ func TestPanelGitHubLink(t *testing.T) {
 		`href="https://github.com/gouwenct/cpa-scheduled-tests" target="_blank" rel="noopener noreferrer"`,
 		`GitHub · Star</a>`,
 		`onclick="openBulkPlan()"`,
+		`onclick="deleteAllPlans()"`,
+		`一键删除全部定时计划</button>`,
 		`<th>分组</th>`,
 		`id="planGroup"`,
 		`id="planModel"`,

@@ -505,6 +505,21 @@ func bulkCreatePlans(accounts []AuthFile, spec BulkPlanSpec) (BulkPlanResult, er
 	return result, nil
 }
 
+func deleteAllPlans() (int, error) {
+	rt.mu.Lock()
+	defer rt.mu.Unlock()
+	plans := rt.state.Plans
+	if len(plans) == 0 {
+		return 0, nil
+	}
+	rt.state.Plans = []Plan{}
+	if err := saveStateLocked(); err != nil {
+		rt.state.Plans = plans
+		return 0, err
+	}
+	return len(plans), nil
+}
+
 func deletePlan(id string) error {
 	id = strings.TrimSpace(id)
 	if id == "" {

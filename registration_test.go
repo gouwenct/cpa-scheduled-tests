@@ -46,3 +46,12 @@ func TestManagementRegistrationIncludesBulkCreate(t *testing.T) {
 	}
 	t.Fatalf("bulk create route %q not registered", want)
 }
+
+func TestManagementRegistrationIncludesDeleteAll(t *testing.T) {
+	for _, r := range managementRegistrationResult().Routes {
+		if r.Path == "/plugins/"+pluginID+"/plans/delete-all" && r.Method == "POST" {
+			return
+		}
+	}
+	t.Fatal("delete-all POST route not registered")
+}

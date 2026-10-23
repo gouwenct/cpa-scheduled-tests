@@ -76,7 +76,7 @@ import (
 
 const (
 	pluginID                      = "cpa-scheduled-tests"
-	pluginVersion                 = "0.1.6"
+	pluginVersion                 = "0.1.7"
 	supportedSchemaVersion uint32 = 6
 )
 
@@ -238,6 +238,7 @@ func managementRegistrationResult() managementRegistration {
 		{Method: "POST", Path: "/plugins/" + pluginID + "/plans/save", Description: "Create or update a scheduled test plan."},
 		{Method: "POST", Path: "/plugins/" + pluginID + "/plans/bulk-create", Description: "Create one scheduled test plan for every Codex account, skipping exact duplicates."},
 		{Method: "POST", Path: "/plugins/" + pluginID + "/plans/delete", Description: "Delete a scheduled test plan."},
+		{Method: "POST", Path: "/plugins/" + pluginID + "/plans/delete-all", Description: "Delete all scheduled test plans, preserving CPA accounts, settings and logs."},
 		{Method: "POST", Path: "/plugins/" + pluginID + "/settings", Description: "Update plugin runtime settings."},
 		{Method: "POST", Path: "/plugins/" + pluginID + "/run", Description: "Run one plan or one account immediately."},
 		{Method: "POST", Path: "/plugins/" + pluginID + "/run-all", Description: "Send one request to every Codex account, including disabled/unavailable records."},

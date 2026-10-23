@@ -103,6 +103,7 @@ assert reg['metadata']['Name'] == 'CPA Scheduled 5H'
 assert reg['metadata']['GitHubRepository']
 mg = call('management.register')
 assert any(r['Path'].endswith('/run-all') for r in mg['routes'])
+assert any(r['Path'].endswith('/plans/delete-all') and r['Method'] == 'POST' for r in mg['routes'])
 
 def mgmt(method, path, body=None, query=None):
     req = {
@@ -163,6 +164,24 @@ assert {'a1','b2'}.issubset(seen), seen
 assert any(x.get('disabled') for x in logs['logs'] if x['auth_index']=='b2')
 assert all(x.get('five_hour_status') == 'open' for x in logs['logs'][:2]), logs['logs'][:2]
 assert all(x.get('five_hour_used_percent') == 25.0 for x in logs['logs'][:2]), logs['logs'][:2]
+status, rejected = mgmt('GET','/plugins/cpa-scheduled-tests/plans/delete-all')
+assert status == 404, (status, rejected)
+settings_before = st['settings']
+accounts_before = st['accounts']
+status, deleted = mgmt('POST','/plugins/cpa-scheduled-tests/plans/delete-all', {})
+assert status == 200 and deleted['deleted'] == 2, (status, deleted)
+status, st = mgmt('GET','/plugins/cpa-scheduled-tests/state')
+assert status == 200 and st['plans'] == [], st
+assert st['accounts'] == accounts_before and st['settings'] == settings_before, st
+status, logs_after = mgmt('GET','/plugins/cpa-scheduled-tests/logs', query={'limit':['20']})
+assert status == 200 and logs_after == logs, logs_after
+assert len(http_calls) == 3, http_calls
+status, deleted = mgmt('POST','/plugins/cpa-scheduled-tests/plans/delete-all', {})
+assert status == 200 and deleted['deleted'] == 0, (status, deleted)
+plugin.shutdown()
+call('plugin.register', {'schema_version': 6, 'plugin_dir': test_data.name})
+status, st = mgmt('GET','/plugins/cpa-scheduled-tests/state')
+assert status == 200 and st['plans'] == [] and len(st['accounts']) == 2, st
 plugin.shutdown()
 test_data.cleanup()
-print('ABI smoke test passed: registration, state, bulk plan create+dedupe, run-all, disabled account inclusion, logs')
+print('ABI smoke test passed: registration, state, bulk plan create+dedupe, run-all, disabled account inclusion, logs, delete-all+restart+preservation')

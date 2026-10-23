@@ -91,6 +91,13 @@ func handleManagement(raw []byte) []byte {
 		}
 		return okEnvelope(jsonResponse(200, result))
 
+	case method == http.MethodPost && strings.HasSuffix(path, "/plugins/"+pluginID+"/plans/delete-all"):
+		deleted, err := deleteAllPlans()
+		if err != nil {
+			return managementError(500, err)
+		}
+		return okEnvelope(jsonResponse(200, map[string]any{"deleted": deleted}))
+
 	case method == http.MethodPost && strings.HasSuffix(path, "/plugins/"+pluginID+"/plans/delete"):
 		var body deletePlanRequest
 		if json.Unmarshal(req.Body, &body) != nil {

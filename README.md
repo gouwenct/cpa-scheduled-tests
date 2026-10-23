@@ -14,6 +14,7 @@ English version: [README_EN.md](README_EN.md)
 
 - **账号 + Model + Cron** 的定时测试计划：每个 Cron 时刻在设定分钟和下一分钟各发送一次，无论第一次结果如何；
 - **一键为全部 Codex 账号创建定时计划**：统一指定 Model、Cron、时区和 Prompt，自动一账号一计划，并跳过完全重复计划；
+- **一键删除全部定时计划**：确认后清空所有分组、所有分页的计划，保留 CPA 账号、凭据、设置和运行日志；已开始的请求会继续完成；
 - 每个计划的 **立即发送、暂停/恢复**，计划表每页显示 10 条；
 - 计划按 **分组** 管理，编辑和新建计划提供账号、Model 的下拉选择及默认值，Cron 保留自由输入；
 - 时区支持常用建议和任意有效 IANA 时区输入；新建计划默认使用浏览器时区，编辑时保留计划已保存的时区；
@@ -25,7 +26,7 @@ English version: [README_EN.md](README_EN.md)
 
 “全部账号立即发送”是**强制真实请求**，默认 Prompt 为“你好”。发送后会读取响应头中的五小时窗口数据；缺少明确数据时，使用同一账号凭据查询上游额度接口。日志显示发送后的窗口快照：确认 300 分钟窗口已有用量且重置时间未到，为“已开启”；用量达到 100% 时为“已开启 · 额度耗尽”；缺少数据或旧日志为“未知”。HTTP 200 本身不作为窗口开启的证据。该操作会产生极小的真实模型请求消耗。对于 `disabled` / `unavailable` 的 auth 文件，插件仍会尝试读取凭据并请求；若 token 已失效，会记录 `auth_error`，不会偷偷修改 CPA 账号状态。
 
-当前 v0.1.6 专门面向 **Codex / ChatGPT OAuth auth**。UI 会通过 CPA 的 `model-definitions/codex` 自动同步当前模型列表作为下拉选项。
+当前 v0.1.7 专门面向 **Codex / ChatGPT OAuth auth**。UI 会通过 CPA 的 `model-definitions/codex` 自动同步当前模型列表作为下拉选项。
 
 ## UI
 
@@ -195,6 +196,7 @@ GET  /plugins/cpa-scheduled-tests/state
 POST /plugins/cpa-scheduled-tests/plans/save
 POST /plugins/cpa-scheduled-tests/plans/bulk-create
 POST /plugins/cpa-scheduled-tests/plans/delete
+POST /plugins/cpa-scheduled-tests/plans/delete-all
 POST /plugins/cpa-scheduled-tests/settings
 POST /plugins/cpa-scheduled-tests/run
 POST /plugins/cpa-scheduled-tests/run-all
@@ -221,7 +223,7 @@ POST /plugins/cpa-scheduled-tests/logs/clear
 
 ```text
 dist\cpa-scheduled-tests.dll
-dist\cpa-scheduled-tests_0.1.6_windows_amd64.zip
+dist\cpa-scheduled-tests_0.1.7_windows_amd64.zip
 ```
 
 ## 安全设计

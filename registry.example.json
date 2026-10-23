@@ -4,10 +4,10 @@
     {
       "id": "cpa-scheduled-tests",
       "name": "CPA Scheduled 5H",
-      "description": "Scheduled per-account Codex requests with five-hour quota window status, groups, pause/resume and execution logs.",
+      "description": "Scheduled per-account Codex requests with five-hour quota window status, bulk plan creation/deletion, groups, pause/resume and execution logs.",
       "author": "gouwenct",
-      "version": "0.1.6",
-      "release-tag": "v0.1.6",
+      "version": "0.1.7",
+      "release-tag": "v0.1.7",
       "repository": "https://github.com/gouwenct/cpa-scheduled-tests",
       "logo": "https://raw.githubusercontent.com/gouwenct/cpa-scheduled-tests/main/assets/logo.png",
       "homepage": "https://github.com/gouwenct/cpa-scheduled-tests",

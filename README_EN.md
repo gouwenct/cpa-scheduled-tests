@@ -16,6 +16,7 @@ The screenshot shows an earlier UI; current releases also include bulk plan crea
 
 - Per-account scheduled tests: **Account + Model + Cron + Timezone + Prompt**. Each Cron occurrence sends once in the configured minute and again in the following minute, regardless of the first result. Both results are logged; the second is marked `scheduled+1min`. Manual sends remain single requests. This improves activation reliability but cannot bypass upstream quota limits.
 - **Bulk-create plans for all Codex accounts** with duplicate detection
+- **Delete all scheduled plans in one action**, after confirmation, across all groups and pages. CPA accounts, credentials, settings and execution logs are preserved; requests already started finish normally.
 - Per-plan **Run Now** and pause/resume controls, with 10 plans per page
 - Plans are organized by **group**, with dropdown defaults for account and model; Cron remains free-form
 - Timezones accept suggestions or any valid IANA timezone. New plans default to the browser timezone; editing preserves the saved timezone.
